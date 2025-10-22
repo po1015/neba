@@ -4,7 +4,7 @@ async function main() {
   console.log("🧪 Testing Deployed NEBA Token Contract...");
   console.log("==========================================");
 
-  const nebaTokenAddress = "0x75770723EBBed7D482b6F02b6244B411A86C9fC6";
+  const nebaTokenAddress = "0x61D69E7a67BDf4Fc90d0c3036465727e53Dcf4b0";
   
   // Get the contract and signers
   const nebaToken = await ethers.getContractAt("NEBA", nebaTokenAddress);

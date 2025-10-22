@@ -75,6 +75,9 @@ TREASURY_ADDRESS=your_treasury_address
 ## 📄 Documentation
 
 - [Client Requirements Implementation](CLIENT_REQUIREMENTS_IMPLEMENTATION.md) - Detailed compliance tracking
+- [Audit Factsheet](Docs/AUDIT_FACTSHEET.md) - Project metrics and specifications
+- [Threat Model](audits/threat-model.md) - Security analysis and risk assessment
+- [NatSpec Documentation](Docs/natspec.md) - Complete contract documentation
 
 ## 🔒 Security Features
 
@@ -100,6 +103,61 @@ All tests passing:
 ## 🚀 Deployment
 
 The contract is ready for production deployment with all critical requirements implemented.
+
+## 🔄 Reproducibility
+
+### Audit Commands
+```bash
+# Build and compile contracts
+npm run build
+
+# Run all tests
+npm test
+
+# Run fuzz tests
+npm run test:fuzz
+
+# Run invariant tests
+npm run test:invariants
+
+# Run fork tests (requires Foundry)
+npm run test:fork
+
+# Run storage layout tests
+npm run test:storage
+
+# Run static analysis
+npm run audit:slither
+
+# Run coverage analysis (≥95% threshold)
+npm run audit:coverage
+
+# Run all audit checks
+npm run audit:all
+
+# Run complete CI pipeline
+npm run ci
+```
+
+### One-Command Reproduction
+```bash
+# Complete audit pipeline
+npm run ci
+```
+
+### Environment Setup
+```bash
+# Install dependencies
+npm install
+
+# Install additional tools
+pip install slither-analyzer
+forge install
+
+# Set up environment
+cp env.example .env
+# Edit .env with your configuration
+```
 
 ## 📞 Support
 
