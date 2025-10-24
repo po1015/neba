@@ -124,6 +124,13 @@ contract NEBA is
         
         // Mint initial supply to treasury
         _mint(treasury, MAX_SUPPLY);
+    }
+    
+    /**
+     * @notice Receive ETH
+     * @dev Allows contract to receive ETH for recovery purposes
+     */
+    receive() external payable {
         
         // CRITICAL: Deployer (msg.sender) has NO roles after deployment
         // This is verified in tests

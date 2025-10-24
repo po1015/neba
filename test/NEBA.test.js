@@ -10,17 +10,21 @@ describe("NEBA Token", function () {
   let admin;
 
   const MAX_SUPPLY = ethers.parseEther("1000000000"); // 1 billion tokens
-  const COMMIT_TIMEOUT = 3600; // 1 hour
-  const CIRCUIT_BREAKER_RESET_INTERVAL = 86400; // 24 hours
 
   beforeEach(async function () {
     [owner, treasury, admin, user1, user2] = await ethers.getSigners();
 
-    // Deploy the NEBA token
+    // Deploy the NEBA token with Phase 2 parameters
     const NEBA = await ethers.getContractFactory("NEBA");
     nebaToken = await upgrades.deployProxy(
       NEBA,
-      [treasury.address, admin.address, COMMIT_TIMEOUT, CIRCUIT_BREAKER_RESET_INTERVAL],
+      [
+        treasury.address,  // _treasury
+        admin.address,     // _mainSafe
+        admin.address,     // _opsSafe
+        admin.address,     // _botExecutor
+        admin.address      // _saleContract
+      ],
       {
         initializer: "initialize",
         kind: "uups"
@@ -42,27 +46,25 @@ describe("NEBA Token", function () {
 
     it("Should set up roles correctly", async function () {
       const DEFAULT_ADMIN_ROLE = await nebaToken.DEFAULT_ADMIN_ROLE();
+      const RECOVERY_ROLE = await nebaToken.RECOVERY_ROLE();
       const UPGRADER_ROLE = await nebaToken.UPGRADER_ROLE();
+      const UPGRADER_ADMIN_ROLE = await nebaToken.UPGRADER_ADMIN_ROLE();
+      const MINTER_ROLE = await nebaToken.MINTER_ROLE();
       const ADMIN_PAUSER_ROLE = await nebaToken.ADMIN_PAUSER_ROLE();
-      const BLOCKLIST_MANAGER_ROLE = await nebaToken.BLOCKLIST_MANAGER_ROLE();
-      const WHITELIST_MANAGER_ROLE = await nebaToken.WHITELIST_MANAGER_ROLE();
-      const CIRCUIT_BREAKER_ROLE = await nebaToken.CIRCUIT_BREAKER_ROLE();
-      const SNAPSHOT_ROLE = await nebaToken.SNAPSHOT_ROLE();
+      const BOT_PAUSER_ROLE = await nebaToken.BOT_PAUSER_ROLE();
 
       expect(await nebaToken.hasRole(DEFAULT_ADMIN_ROLE, admin.address)).to.be.true;
+      expect(await nebaToken.hasRole(RECOVERY_ROLE, admin.address)).to.be.true;
       expect(await nebaToken.hasRole(UPGRADER_ROLE, admin.address)).to.be.true;
+      expect(await nebaToken.hasRole(UPGRADER_ADMIN_ROLE, admin.address)).to.be.true;
+      expect(await nebaToken.hasRole(MINTER_ROLE, admin.address)).to.be.true;
       expect(await nebaToken.hasRole(ADMIN_PAUSER_ROLE, admin.address)).to.be.true;
-      expect(await nebaToken.hasRole(BLOCKLIST_MANAGER_ROLE, admin.address)).to.be.true;
-      expect(await nebaToken.hasRole(WHITELIST_MANAGER_ROLE, admin.address)).to.be.true;
-      expect(await nebaToken.hasRole(CIRCUIT_BREAKER_ROLE, admin.address)).to.be.true;
-      expect(await nebaToken.hasRole(SNAPSHOT_ROLE, admin.address)).to.be.true;
+      expect(await nebaToken.hasRole(BOT_PAUSER_ROLE, admin.address)).to.be.true;
     });
   });
 
   describe("Transfer Functionality", function () {
     beforeEach(async function () {
-      // Enable trading first
-      await nebaToken.connect(admin).enableTrading();
       // Transfer some tokens from treasury to user1 for testing
       await nebaToken.connect(treasury).transfer(user1.address, ethers.parseEther("1000"));
     });
@@ -76,91 +78,17 @@ describe("NEBA Token", function () {
 
       expect(await nebaToken.balanceOf(user2.address)).to.equal(transferAmount);
     });
-
-    it("Should not allow transfers from blocked addresses", async function () {
-      // Block user1
-      await nebaToken.connect(admin).updateBlocklist(user1.address, true);
-
-      await expect(
-        nebaToken.connect(user1).transfer(user2.address, ethers.parseEther("100"))
-      ).to.be.revertedWithCustomError(nebaToken, "BlockedAddress");
-    });
-
-    it("Should not allow transfers to blocked addresses", async function () {
-      // Block user2
-      await nebaToken.connect(admin).updateBlocklist(user2.address, true);
-
-      await expect(
-        nebaToken.connect(user1).transfer(user2.address, ethers.parseEther("100"))
-      ).to.be.revertedWithCustomError(nebaToken, "BlockedAddress");
-    });
-  });
-
-  describe("Transfer Restrictions", function () {
-    beforeEach(async function () {
-      // Enable trading first for these tests
-      await nebaToken.connect(admin).enableTrading();
-    });
-
-    it("Should check transfer restrictions correctly", async function () {
-      // No restrictions initially
-      expect(await nebaToken.isTransferAllowed(
-        treasury.address, 
-        user1.address
-      )).to.be.true;
-
-      // Block an address
-      await nebaToken.connect(admin).updateBlocklist(user1.address, true);
-      
-      expect(await nebaToken.isTransferAllowed(
-        treasury.address, 
-        user1.address
-      )).to.be.false;
-    });
-
-    it("Should handle whitelist restrictions", async function () {
-      // Enable transfer restrictions
-      await nebaToken.connect(admin).toggleTransferRestrictions();
-      
-      // Check that transfer restrictions are enabled
-      expect(await nebaToken.transferRestrictionsEnabled()).to.be.true;
-      
-      // Treasury should still be allowed (treasury is always whitelisted)
-      expect(await nebaToken.isTransferAllowed(
-        treasury.address, 
-        user1.address
-      )).to.be.true;
-
-      // Regular user should not be allowed when restrictions are enabled
-      expect(await nebaToken.isTransferAllowed(
-        user1.address, 
-        user2.address
-      )).to.be.false;
-
-      // After whitelisting both addresses, transfers should be allowed
-      await nebaToken.connect(admin).updateWhitelist(user1.address, true);
-      await nebaToken.connect(admin).updateWhitelist(user2.address, true);
-      
-      // Verify both are whitelisted
-      expect(await nebaToken.whitelist(user1.address)).to.be.true;
-      expect(await nebaToken.whitelist(user2.address)).to.be.true;
-      
-      expect(await nebaToken.isTransferAllowed(
-        user1.address, 
-        user2.address
-      )).to.be.true;
-    });
   });
 
   describe("Pausable Functionality", function () {
     it("Should allow admin to pause and unpause", async function () {
       await expect(nebaToken.connect(admin).pause())
-        .to.emit(nebaToken, "ContractPaused");
+        .to.emit(nebaToken, "Paused");
 
       expect(await nebaToken.paused()).to.be.true;
 
       await expect(nebaToken.connect(admin).unpause())
-        .to.emit(nebaToken, "ContractUnpaused");
+        .to.emit(nebaToken, "Unpaused");
 
       expect(await nebaToken.paused()).to.be.false;
     });
@@ -170,34 +98,47 @@ describe("NEBA Token", function () {
 
       await expect(
         nebaToken.connect(treasury).transfer(user1.address, ethers.parseEther("100"))
-      ).to.be.revertedWithCustomError(nebaToken, "EnforcedPause");
+      ).to.be.revertedWith("Token transfers paused");
     });
   });
 
-  describe("Circuit Breaker", function () {
-    it("Should allow admin to trigger circuit breaker", async function () {
-      await expect(nebaToken.connect(admin).triggerCircuitBreaker("Test reason"))
-        .to.emit(nebaToken, "CircuitBreakerTriggered");
-
-      expect(await nebaToken.circuitBreakerTriggered()).to.be.true;
-    });
-
-    it("Should prevent transfers when circuit breaker is active", async function () {
-      await nebaToken.connect(admin).triggerCircuitBreaker("Test reason");
-
+  describe("Minting Functionality", function () {
+    it("Should prevent minting when cap is already reached", async function () {
+      const mintAmount = ethers.parseEther("1000");
+      
       await expect(
-        nebaToken.connect(treasury).transfer(user1.address, ethers.parseEther("100"))
-      ).to.be.revertedWithCustomError(nebaToken, "CircuitBreakerActive");
+        nebaToken.connect(admin).mint(user1.address, mintAmount)
+      ).to.be.revertedWithCustomError(nebaToken, "ERC20ExceededCap");
     });
 
-    it("Should allow admin to reset circuit breaker", async function () {
-      await nebaToken.connect(admin).triggerCircuitBreaker("Test reason");
-      expect(await nebaToken.circuitBreakerTriggered()).to.be.true;
+    it("Should prevent non-minter from minting", async function () {
+      await expect(
+        nebaToken.connect(user1).mint(user2.address, ethers.parseEther("1000"))
+      ).to.be.revertedWithCustomError(nebaToken, "AccessControlUnauthorizedAccount");
+    });
+  });
 
-      await expect(nebaToken.connect(admin).resetCircuitBreaker())
-        .to.emit(nebaToken, "CircuitBreakerReset");
+  describe("Recovery Functionality", function () {
+    it("Should allow recovery of ETH", async function () {
+      // Send some ETH to the contract
+      await owner.sendTransaction({
+        to: await nebaToken.getAddress(),
+        value: ethers.parseEther("1")
+      });
 
-      expect(await nebaToken.circuitBreakerTriggered()).to.be.false;
+      const initialBalance = await ethers.provider.getBalance(admin.address);
+      
+      await expect(nebaToken.connect(admin).recoverETH(admin.address, ethers.parseEther("1")))
+        .to.emit(nebaToken, "ETHRecovered");
+
+      const finalBalance = await ethers.provider.getBalance(admin.address);
+      expect(finalBalance).to.be.greaterThan(initialBalance);
+    });
+
+    it("Should prevent recovery of NEBA tokens", async function () {
+      await expect(
+        nebaToken.connect(admin).recoverERC20(await nebaToken.getAddress(), admin.address, ethers.parseEther("1000"))
+      ).to.be.revertedWith("Cannot recover NEBA");
     });
   });
 
@@ -207,160 +148,6 @@ describe("NEBA Token", function () {
       // For now, we just verify the role is set correctly
       const UPGRADER_ROLE = await nebaToken.UPGRADER_ROLE();
       expect(await nebaToken.hasRole(UPGRADER_ROLE, admin.address)).to.be.true;
-    });
-  });
-
-  describe("Role Management", function () {
-    it("Should allow admin to grant bot pauser role", async function () {
-      await expect(nebaToken.connect(admin).grantBotPauserRole(user1.address))
-        .to.not.be.reverted;
-      
-      const BOT_PAUSER_ROLE = await nebaToken.BOT_PAUSER_ROLE();
-      expect(await nebaToken.hasRole(BOT_PAUSER_ROLE, user1.address)).to.be.true;
-    });
-
-    it("Should allow admin to grant governance unpauser role", async function () {
-      await expect(nebaToken.connect(admin).grantGovernanceUnpauserRole(user1.address))
-        .to.not.be.reverted;
-      
-      const GOVERNANCE_UNPAUSER_ROLE = await nebaToken.GOVERNANCE_UNPAUSER_ROLE();
-      expect(await nebaToken.hasRole(GOVERNANCE_UNPAUSER_ROLE, user1.address)).to.be.true;
-    });
-
-    it("Should allow admin to grant emergency guardian role", async function () {
-      await expect(nebaToken.connect(admin).grantEmergencyGuardianRole(user1.address))
-        .to.not.be.reverted;
-      
-      const EMERGENCY_GUARDIAN_ROLE = await nebaToken.EMERGENCY_GUARDIAN_ROLE();
-      expect(await nebaToken.hasRole(EMERGENCY_GUARDIAN_ROLE, user1.address)).to.be.true;
-    });
-
-    it("Should prevent non-admin from granting roles", async function () {
-      await expect(
-        nebaToken.connect(user1).grantBotPauserRole(user2.address)
-      ).to.be.revertedWithCustomError(nebaToken, "AccessControlUnauthorizedAccount");
-    });
-  });
-
-  describe("Enhanced Pause Functionality", function () {
-    beforeEach(async function () {
-      // Grant roles to test addresses
-      await nebaToken.connect(admin).grantBotPauserRole(user1.address);
-      await nebaToken.connect(admin).grantEmergencyGuardianRole(user2.address);
-    });
-
-    it("Should allow bot pauser to pause", async function () {
-      await expect(nebaToken.connect(user1).pause())
-        .to.emit(nebaToken, "ContractPaused");
-      
-      expect(await nebaToken.paused()).to.be.true;
-    });
-
-    it("Should allow emergency guardian to pause", async function () {
-      await expect(nebaToken.connect(user2).pause())
-        .to.emit(nebaToken, "ContractPaused");
-      
-      expect(await nebaToken.paused()).to.be.true;
-    });
-
-    it("Should prevent unauthorized pause", async function () {
-      // Use a new signer who doesn't have any pauser role
-      const signers = await ethers.getSigners();
-      const unauthorizedUser = signers[5]; // Get a fresh signer
-      await expect(
-        nebaToken.connect(unauthorizedUser).pause()
-      ).to.be.revertedWith("Caller must have pauser role");
-    });
-  });
-
-  describe("Whitelist Management", function () {
-    it("Should allow whitelist manager to update whitelist", async function () {
-      // Grant whitelist manager role to user1
-      const WHITELIST_MANAGER_ROLE = await nebaToken.WHITELIST_MANAGER_ROLE();
-      await nebaToken.connect(admin).grantRole(WHITELIST_MANAGER_ROLE, user1.address);
-
-      await expect(nebaToken.connect(user1).updateWhitelist(user2.address, true))
-        .to.emit(nebaToken, "WhitelistUpdated")
-        .withArgs(user2.address, true);
-    });
-
-    it("Should prevent non-whitelist manager from updating whitelist", async function () {
-      await expect(
-        nebaToken.connect(user1).updateWhitelist(user2.address, true)
-      ).to.be.revertedWithCustomError(nebaToken, "AccessControlUnauthorizedAccount");
-    });
-  });
-
-  describe("Snapshot Functionality", function () {
-    it("Should allow admin to create snapshot", async function () {
-      const tx = await nebaToken.connect(admin).createSnapshot();
-      await tx.wait();
-      
-      // Verify snapshot was created
-      const snapshot = await nebaToken.getSnapshot(1);
-      expect(snapshot.id).to.equal(1);
-      expect(snapshot.timestamp).to.be.greaterThan(0);
-      expect(snapshot.totalSupply).to.equal(ethers.parseEther("1000000000"));
-      expect(snapshot.active).to.be.true;
-    });
-
-    it("Should emit SnapshotCreated event", async function () {
-      await expect(nebaToken.connect(admin).createSnapshot())
-        .to.emit(nebaToken, "SnapshotCreated");
-    });
-
-    it("Should increment snapshot ID for multiple snapshots", async function () {
-      const tx1 = await nebaToken.connect(admin).createSnapshot();
-      await tx1.wait();
-      
-      const tx2 = await nebaToken.connect(admin).createSnapshot();
-      await tx2.wait();
-      
-      // Verify both snapshots exist
-      expect(await nebaToken.snapshotExists(1)).to.be.true;
-      expect(await nebaToken.snapshotExists(2)).to.be.true;
-    });
-
-    it("Should get latest snapshot ID", async function () {
-      expect(await nebaToken.getLatestSnapshotId()).to.equal(0);
-      
-      await nebaToken.connect(admin).createSnapshot();
-      expect(await nebaToken.getLatestSnapshotId()).to.equal(1);
-      
-      await nebaToken.connect(admin).createSnapshot();
-      expect(await nebaToken.getLatestSnapshotId()).to.equal(2);
-    });
-
-    it("Should revert when getting non-existent snapshot", async function () {
-      await expect(nebaToken.getSnapshot(999))
-        .to.be.revertedWithCustomError(nebaToken, "SnapshotNotFound");
-    });
-
-    it("Should prevent non-snapshot role from creating snapshot", async function () {
-      await expect(
-        nebaToken.connect(user1).createSnapshot()
-      ).to.be.revertedWithCustomError(nebaToken, "AccessControlUnauthorizedAccount");
-    });
-
-    it("Should allow admin to grant snapshot role", async function () {
-      const SNAPSHOT_ROLE = await nebaToken.SNAPSHOT_ROLE();
-      await nebaToken.connect(admin).grantRole(SNAPSHOT_ROLE, user1.address);
-      
-      // Now user1 should be able to create snapshots
-      const tx = await nebaToken.connect(user1).createSnapshot();
-      await tx.wait();
-      
-      // Verify snapshot was created
-      const snapshot = await nebaToken.getSnapshot(1);
-      expect(snapshot.id).to.equal(1);
-    });
-
-    it("Should check snapshot existence correctly", async function () {
-      expect(await nebaToken.snapshotExists(1)).to.be.false;
-      
-      await nebaToken.connect(admin).createSnapshot();
-      expect(await nebaToken.snapshotExists(1)).to.be.true;
-      expect(await nebaToken.snapshotExists(2)).to.be.false;
     });
   });
 });

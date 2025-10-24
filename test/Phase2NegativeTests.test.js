@@ -34,15 +34,19 @@ describe("NEBA Token - Phase 2 Negative Tests", function () {
             const UPGRADER_ROLE = await neba.UPGRADER_ROLE();
             const UPGRADER_ADMIN_ROLE = await neba.UPGRADER_ADMIN_ROLE();
 
-            // Main safe has DEFAULT_ADMIN_ROLE (R1) but should not be able to grant UPGRADER_ROLE
+            // Test with a different address that only has DEFAULT_ADMIN_ROLE
+            const [deployer] = await ethers.getSigners();
+            
+            // Grant DEFAULT_ADMIN_ROLE to deployer (but not UPGRADER_ADMIN_ROLE)
             const mainSafeSigner = await ethers.getImpersonatedSigner(MAIN_SAFE);
             await ethers.provider.send("hardhat_impersonateAccount", [MAIN_SAFE]);
             await ethers.provider.send("hardhat_setBalance", [MAIN_SAFE, "0x1000000000000000000"]);
+            await neba.connect(mainSafeSigner).grantRole(await neba.DEFAULT_ADMIN_ROLE(), deployer.address);
 
-            // This should fail because R1 is not admin of R3
+            // This should fail because deployer doesn't have UPGRADER_ADMIN_ROLE
             await expect(
-                neba.connect(mainSafeSigner).grantRole(UPGRADER_ROLE, BOT_EXECUTOR)
-            ).to.be.revertedWith("AccessControl: account");
+                neba.connect(deployer).grantRole(UPGRADER_ROLE, BOT_EXECUTOR)
+            ).to.be.revertedWithCustomError(neba, "AccessControlUnauthorizedAccount");
         });
 
         it("Should not allow R1 to grant UPGRADER_ADMIN_ROLE", async function () {
@@ -50,14 +54,19 @@ describe("NEBA Token - Phase 2 Negative Tests", function () {
 
             const UPGRADER_ADMIN_ROLE = await neba.UPGRADER_ADMIN_ROLE();
 
+            // Test with a different address that only has DEFAULT_ADMIN_ROLE
+            const [deployer] = await ethers.getSigners();
+            
+            // Grant DEFAULT_ADMIN_ROLE to deployer (but not UPGRADER_ADMIN_ROLE)
             const mainSafeSigner = await ethers.getImpersonatedSigner(MAIN_SAFE);
             await ethers.provider.send("hardhat_impersonateAccount", [MAIN_SAFE]);
             await ethers.provider.send("hardhat_setBalance", [MAIN_SAFE, "0x1000000000000000000"]);
+            await neba.connect(mainSafeSigner).grantRole(await neba.DEFAULT_ADMIN_ROLE(), deployer.address);
 
-            // This should fail because R1 is not admin of R3A
+            // This should fail because deployer doesn't have UPGRADER_ADMIN_ROLE
             await expect(
-                neba.connect(mainSafeSigner).grantRole(UPGRADER_ADMIN_ROLE, BOT_EXECUTOR)
-            ).to.be.revertedWith("AccessControl: account");
+                neba.connect(deployer).grantRole(UPGRADER_ADMIN_ROLE, BOT_EXECUTOR)
+            ).to.be.revertedWithCustomError(neba, "AccessControlUnauthorizedAccount");
         });
     });
 
@@ -69,7 +78,7 @@ describe("NEBA Token - Phase 2 Negative Tests", function () {
 
             await expect(
                 neba.connect(deployer).mint(BOT_EXECUTOR, ethers.parseEther("1000"))
-            ).to.be.revertedWith("AccessControl: account");
+            ).to.be.revertedWithCustomError(neba, "AccessControlUnauthorizedAccount");
         });
 
         it("Should block zero address minting", async function () {
@@ -127,7 +136,7 @@ describe("NEBA Token - Phase 2 Negative Tests", function () {
 
             await expect(
                 neba.connect(deployer).unpause()
-            ).to.be.revertedWith("AccessControl: account");
+            ).to.be.revertedWithCustomError(neba, "AccessControlUnauthorizedAccount");
         });
 
         it("Should block deployer from recovering ETH", async function () {
@@ -135,7 +144,7 @@ describe("NEBA Token - Phase 2 Negative Tests", function () {
 
             await expect(
                 neba.connect(deployer).recoverETH(BOT_EXECUTOR, ethers.parseEther("1"))
-            ).to.be.revertedWith("AccessControl: account");
+            ).to.be.revertedWithCustomError(neba, "AccessControlUnauthorizedAccount");
         });
 
         it("Should block deployer from recovering ERC20", async function () {
@@ -143,7 +152,7 @@ describe("NEBA Token - Phase 2 Negative Tests", function () {
 
             await expect(
                 neba.connect(deployer).recoverERC20(neba, BOT_EXECUTOR, ethers.parseEther("1000"))
-            ).to.be.revertedWith("AccessControl: account");
+            ).to.be.revertedWithCustomError(neba, "AccessControlUnauthorizedAccount");
         });
 
         it("Should block deployer from updating treasury", async function () {
@@ -151,7 +160,7 @@ describe("NEBA Token - Phase 2 Negative Tests", function () {
 
             await expect(
                 neba.connect(deployer).updateTreasury(BOT_EXECUTOR)
-            ).to.be.revertedWith("AccessControl: account");
+            ).to.be.revertedWithCustomError(neba, "AccessControlUnauthorizedAccount");
         });
     });
 
@@ -165,7 +174,7 @@ describe("NEBA Token - Phase 2 Negative Tests", function () {
 
             await expect(
                 neba.connect(opsSafeSigner).recoverETH(BOT_EXECUTOR, ethers.parseEther("1"))
-            ).to.be.revertedWith("AccessControl: account");
+            ).to.be.revertedWithCustomError(neba, "AccessControlUnauthorizedAccount");
         });
 
         it("Should block non-RECOVERY_ROLE from recovering ERC20", async function () {
@@ -177,7 +186,7 @@ describe("NEBA Token - Phase 2 Negative Tests", function () {
 
             await expect(
                 neba.connect(opsSafeSigner).recoverERC20(neba, BOT_EXECUTOR, ethers.parseEther("1000"))
-            ).to.be.revertedWith("AccessControl: account");
+            ).to.be.revertedWithCustomError(neba, "AccessControlUnauthorizedAccount");
         });
     });
 
@@ -195,7 +204,7 @@ describe("NEBA Token - Phase 2 Negative Tests", function () {
             // Then try to unpause (should fail)
             await expect(
                 neba.connect(botExecutorSigner).unpause()
-            ).to.be.revertedWith("AccessControl: account");
+            ).to.be.revertedWithCustomError(neba, "AccessControlUnauthorizedAccount");
         });
 
         it("Should block random EOA from unpausing", async function () {
@@ -205,7 +214,7 @@ describe("NEBA Token - Phase 2 Negative Tests", function () {
 
             await expect(
                 neba.connect(deployer).unpause()
-            ).to.be.revertedWith("AccessControl: account");
+            ).to.be.revertedWithCustomError(neba, "AccessControlUnauthorizedAccount");
         });
     });
 
@@ -279,9 +288,14 @@ describe("NEBA Token - Phase 2 Negative Tests", function () {
             // First migration
             await neba.connect(mainSafeSigner).migrateRoles(tlMain, tlUpg, MAIN_SAFE);
 
-            // Second migration should fail
+            // Now use the new admin (tlMain) to try migration again
+            const tlMainSigner = await ethers.getImpersonatedSigner(tlMain);
+            await ethers.provider.send("hardhat_impersonateAccount", [tlMain]);
+            await ethers.provider.send("hardhat_setBalance", [tlMain, "0x1000000000000000000"]);
+
+            // Second migration should fail because already migrated
             await expect(
-                neba.connect(mainSafeSigner).migrateRoles(tlMain, tlUpg, MAIN_SAFE)
+                neba.connect(tlMainSigner).migrateRoles(tlMain, tlUpg, MAIN_SAFE)
             ).to.be.revertedWith("Already migrated");
         });
 

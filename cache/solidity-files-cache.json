@@ -1161,51 +1161,6 @@
         "IERC20Permit"
       ]
     },
-    "E:\\Work\\nebaPresale\\neba token contract\\neba\\contracts\\NEBAminimalSimple.sol": {
-      "lastModificationDate": 1761213281692,
-      "contentHash": "3d43d88e5537e6f3e0cd0d771b33b354",
-      "sourceName": "contracts/NEBAminimalSimple.sol",
-      "solcConfig": {
-        "version": "0.8.22",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "viaIR": true,
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.22"
-      ],
-      "artifacts": [
-        "NEBAminimalSimple"
-      ]
-    },
     "E:\\Work\\nebaPresale\\neba token contract\\neba\\node_modules\\@openzeppelin\\contracts-upgradeable\\utils\\ReentrancyGuardUpgradeable.sol": {
       "lastModificationDate": 1760405963934,
       "contentHash": "24562076b21756e3358ede5e844008ce",
@@ -1561,90 +1516,6 @@
         "Errors"
       ]
     },
-    "E:\\Work\\nebaPresale\\neba token contract\\neba\\contracts\\modules\\NEBAemergency.sol": {
-      "lastModificationDate": 1761152595842,
-      "contentHash": "9ce97ce6abeea7b2e9a61101a25bde07",
-      "sourceName": "contracts/modules/NEBAemergency.sol",
-      "solcConfig": {
-        "version": "0.8.22",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "viaIR": true,
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol",
-        "@openzeppelin/contracts/utils/Address.sol",
-        "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
-        "./interfaces/INEBAModule.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.22"
-      ],
-      "artifacts": [
-        "NEBAemergency"
-      ]
-    },
-    "E:\\Work\\nebaPresale\\neba token contract\\neba\\contracts\\modules\\interfaces\\INEBAModule.sol": {
-      "lastModificationDate": 1761152595842,
-      "contentHash": "eac42f7a5ac3f261be9b413d768fd6d9",
-      "sourceName": "contracts/modules/interfaces/INEBAModule.sol",
-      "solcConfig": {
-        "version": "0.8.22",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "viaIR": true,
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.22"
-      ],
-      "artifacts": [
-        "INEBAModule"
-      ]
-    },
     "E:\\Work\\nebaPresale\\neba token contract\\neba\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\utils\\SafeERC20.sol": {
       "lastModificationDate": 1760405963897,
       "contentHash": "1fb9edee1d763745a62d0b1954998792",
@@ -1686,140 +1557,6 @@
         "SafeERC20"
       ]
     },
-    "E:\\Work\\nebaPresale\\neba token contract\\neba\\contracts\\modules\\NEBAcore.sol": {
-      "lastModificationDate": 1761152828313,
-      "contentHash": "448f728fd1d98c7a473be561e34b61bb",
-      "sourceName": "contracts/modules/NEBAcore.sol",
-      "solcConfig": {
-        "version": "0.8.22",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "viaIR": true,
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol",
-        "./interfaces/INEBAModule.sol",
-        "./NEBArateLimiting.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.22"
-      ],
-      "artifacts": [
-        "NEBAcore"
-      ]
-    },
-    "E:\\Work\\nebaPresale\\neba token contract\\neba\\contracts\\modules\\NEBArateLimiting.sol": {
-      "lastModificationDate": 1761152886079,
-      "contentHash": "fb22b08e401db72fd9c4a6e8a1ccc987",
-      "sourceName": "contracts/modules/NEBArateLimiting.sol",
-      "solcConfig": {
-        "version": "0.8.22",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "viaIR": true,
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
-        "./interfaces/INEBAModule.sol",
-        "./NEBAcore.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.22"
-      ],
-      "artifacts": [
-        "NEBArateLimiting"
-      ]
-    },
-    "E:\\Work\\nebaPresale\\neba token contract\\neba\\contracts\\modules\\NEBAsecurity.sol": {
-      "lastModificationDate": 1761152595842,
-      "contentHash": "b1c21476171a640114d34d6e316b9a85",
-      "sourceName": "contracts/modules/NEBAsecurity.sol",
-      "solcConfig": {
-        "version": "0.8.22",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "viaIR": true,
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol",
-        "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
-        "./interfaces/INEBAModule.sol",
-        "../interfaces/ITransferHook.sol",
-        "../interfaces/ICircuitBreaker.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.22"
-      ],
-      "artifacts": [
-        "NEBAsecurity"
-      ]
-    },
     "E:\\Work\\nebaPresale\\neba token contract\\neba\\contracts\\interfaces\\ITransferHook.sol": {
       "lastModificationDate": 1760405962645,
       "contentHash": "69be1c9b114b5bbf73fb0b77e294ecb0",
@@ -1858,47 +1595,6 @@
         "ITransferHook"
       ]
     },
-    "E:\\Work\\nebaPresale\\neba token contract\\neba\\contracts\\TransferHook.sol": {
-      "lastModificationDate": 1760405962646,
-      "contentHash": "29ad5e4415bceacb6ac511c706aafadc",
-      "sourceName": "contracts/TransferHook.sol",
-      "solcConfig": {
-        "version": "0.8.22",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "viaIR": true,
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "./interfaces/ITransferHook.sol",
-        "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.22"
-      ],
-      "artifacts": [
-        "TransferHook"
-      ]
-    },
     "E:\\Work\\nebaPresale\\neba token contract\\neba\\contracts\\interfaces\\INEBAMinter.sol": {
       "lastModificationDate": 1761143720006,
       "contentHash": "d8f502d706b0dcffd6982ff9fbc6e8c0",
@@ -1935,6 +1631,54 @@
       ],
       "artifacts": [
         "INEBAMinter"
+      ]
+    },
+    "E:\\Work\\nebaPresale\\neba token contract\\neba\\contracts\\NEBA.sol": {
+      "lastModificationDate": 1761330603510,
+      "contentHash": "b5f63215ff84a1c13247f2963935954b",
+      "sourceName": "contracts/NEBA.sol",
+      "solcConfig": {
+        "version": "0.8.22",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20CappedUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.22"
+      ],
+      "artifacts": [
+        "INEBAMinter",
+        "NEBA"
       ]
     }
   }
